@@ -3,7 +3,7 @@
 - 주최 : 경기도 우리동네 과학클럽
 - 기간 : 2021.7.1 ~ 2021.9.30
 
-### Description
+## Developmennt
 __07.16__ (V1.1)  
 - feature extraction
 - dimension reduction 
