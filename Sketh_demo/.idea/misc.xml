@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/sala0/AppData/Sketh_demo/app/src/main/res/layout/activity_main.xml" value="0.14351851851851852" />
+        <entry key="..\:/Users/sala0/Project/Andriod/Sketh_demo/app/src/main/res/drawable/image_icon.xml" value="0.22083333333333333" />
+        <entry key="..\:/Users/sala0/Project/Andriod/Sketh_demo/app/src/main/res/layout/activity_main.xml" value="0.2" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
