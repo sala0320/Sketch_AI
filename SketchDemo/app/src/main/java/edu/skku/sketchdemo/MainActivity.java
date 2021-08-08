@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.skku.sketchdemo.ml.EffiExtractor;
 import edu.skku.sketchdemo.ml.EfficientnetLite4Fp32;
 import edu.skku.sketchdemo.ml.EfficientnetLite4Int82;
 
@@ -77,14 +78,17 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap galleryImageBmpResized = Bitmap.createScaledBitmap(galleryImageBmp, 300, 300, false);
 
                 try {
-                    EfficientnetLite4Fp32 model = EfficientnetLite4Fp32.newInstance(MainActivity.this);
+                    EffiExtractor model = EffiExtractor.newInstance(MainActivity.this);
+
+                    // Creates inputs for reference.
                     TensorImage image = TensorImage.fromBitmap(galleryImageBmpResized);
 
-                    EfficientnetLite4Fp32.Outputs outputs = model.process(image);
+                    // Runs model inference and gets result.
+                    EffiExtractor.Outputs outputs = model.process(image);
                     TensorBuffer feature = outputs.getFeatureAsTensorBuffer();
                     System.out.println("feature : " + Arrays.toString(feature.getFloatArray()));
-
                     model.close();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
