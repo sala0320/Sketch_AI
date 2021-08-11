@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: org.bytedeco:javacpp:1.5.6:android-arm">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacpp/1.5.6/c4c4a895c240f5fd3cac5e26bf94b3c2ec06bd8a/javacpp-1.5.6-android-arm.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacpp/1.5.6/1c2ec087fba45cc00ebc547914e4685bb322c107/javacpp-1.5.6-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco/javacpp/1.5.6/8ddff7abe0c3c74eaa8168818b41de0ebee146fc/javacpp-1.5.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

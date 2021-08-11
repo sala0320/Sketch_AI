@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: org.bytedeco:arpack-ng-platform:3.8.0-1.5.6">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco/arpack-ng-platform/3.8.0-1.5.6/1ae318e0f0b506bf56ccce47e348d02d5af23b7e/arpack-ng-platform-3.8.0-1.5.6.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco/arpack-ng-platform/3.8.0-1.5.6/29849d508a1e4a020fcc6308ee7c9f28ece76845/arpack-ng-platform-3.8.0-1.5.6-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco/arpack-ng-platform/3.8.0-1.5.6/29849d508a1e4a020fcc6308ee7c9f28ece76845/arpack-ng-platform-3.8.0-1.5.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
