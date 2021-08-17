@@ -1,50 +1,15 @@
 package smile;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import smile.math.MathEx;
 import smile.stat.distribution.GaussianDistribution;
 
-/**
- * The t-distributed stochastic neighbor embedding. The t-SNE is a nonlinear
- * dimensionality reduction technique that is particularly well suited
- * for embedding high-dimensional data into a space of two or three
- * dimensions, which can then be visualized in a scatter plot. Specifically,
- * it models each high-dimensional object by a two- or three-dimensional
- * point in such a way that similar objects are modeled by nearby points
- * and dissimilar objects are modeled by distant points.
- * <p>
- * The t-SNE algorithm comprises two main stages. First, t-SNE constructs
- * a probability distribution over pairs of high-dimensional objects in
- * such a way that similar objects have a high probability of being picked,
- * whilst dissimilar points have an infinitesimal probability of being picked.
- * Second, t-SNE defines a similar probability distribution over the points
- * in the low-dimensional map, and it minimizes the Kullback–Leibler
- * divergence between the two distributions with respect to the locations
- * of the points in the map. Note that while the original algorithm uses
- * the Euclidean distance between objects as the base of its similarity
- * metric, this should be changed as appropriate.
- *
- * <h2>References</h2>
- * <ol>
- * <li>L.J.P. van der Maaten. Accelerating t-SNE using Tree-Based Algorithms.
- *     Journal of Machine Learning Research 15(Oct):3221-3245, 2014. </li>
- * <li>L.J.P. van der Maaten and G.E. Hinton. Visualizing Non-Metric
- *     Similarities in Multiple Maps. Machine Learning 87(1):33-55, 2012. </li>
- * <li>L.J.P. van der Maaten. Learning a Parametric Embedding by Preserving
- *     Local Structure. In Proceedings of the Twelfth International Conference
- *     on Artificial Intelligence &amp; Statistics (AI-STATS),
- *     JMLR W&amp;CP 5:384-391, 2009. </li>
- * <li>L.J.P. van der Maaten and G.E. Hinton. Visualizing High-Dimensional
- *     Data Using t-SNE. Journal of Machine Learning Research
- *     9(Nov):2579-2605, 2008. </li>
- * </ol>
- *
- * @see UMAP
- *
- * @author Haifeng Li
- */
 
 public class TSNE implements Serializable {
     private static final long serialVersionUID = 2L;
@@ -98,8 +63,9 @@ public class TSNE implements Serializable {
      *          the squared distance/dissimilarity matrix.
      * @param d the dimension of embedding space.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public TSNE(double[][] X, int d) {
-        this(X, d, 20, 200, 1000);
+        this(X, d, 30, 200, 2000);
     }
 
     /** Constructor. Train t-SNE for given number of iterations.
@@ -111,6 +77,7 @@ public class TSNE implements Serializable {
      * @param eta the learning rate.
      * @param iterations the number of iterations.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public TSNE(double[][] X, int d, double perplexity, double eta, int iterations) {
         this.eta = eta;
         int n = X.length;
@@ -170,6 +137,7 @@ public class TSNE implements Serializable {
      * Performs additional iterations.
      * @param iterations the number of iterations.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void update(int iterations) {
         double[][] Y = coordinates;
         int n = Y.length;
@@ -259,6 +227,7 @@ public class TSNE implements Serializable {
     }
 
     /** Compute the Gaussian kernel (search the width for given perplexity. */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private double[][] expd(double[][] D, double perplexity, double tol) {
         int n          = D.length;
         double[][] P   = new double[n][n];
@@ -324,6 +293,7 @@ public class TSNE implements Serializable {
     /**
      * Computes the Q matrix.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private double computeQ(double[][] Y, double[][] Q) {
         int n = Y.length;
 
@@ -348,6 +318,7 @@ public class TSNE implements Serializable {
     /**
      * Computes the cost function.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private double computeCost(double[][] P, double[][] Q) {
         return 2 * IntStream.range(0, Q.length).parallel().mapToDouble(i -> {
             double[] Pi = P[i];
