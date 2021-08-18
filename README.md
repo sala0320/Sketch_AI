@@ -23,5 +23,6 @@ __07.29__ (V2.1)
 ### Android
 __08.04__ (V1.1)
 - add feautre extraction tflite on Miso code
-
+__08.04__ (V2.1)
+- change code to communication with the server
 ### Environment
