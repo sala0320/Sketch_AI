@@ -23,8 +23,10 @@ __07.29__ (V2.1)
 ### Android
 __08.04__ (V1.1)
 - add feautre extraction tflite on Miso code  
+
 __08.17__ (V2.1)
 - change code to communication with the server  
+
 __08.21__ (V3.1)
 - add paint board with color pen
 --------------------------------------------
