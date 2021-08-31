@@ -205,18 +205,14 @@ public class StickerView extends FrameLayout {
           BitmapStickerIcon icon = icons.get(i);
           switch (icon.getPosition()) {
             case BitmapStickerIcon.LEFT_TOP:
-
               configIconMatrix(icon, x1, y1, rotation);
               break;
-
             case BitmapStickerIcon.RIGHT_TOP:
               configIconMatrix(icon, x2, y2, rotation);
               break;
-
             case BitmapStickerIcon.LEFT_BOTTOM:
               configIconMatrix(icon, x3, y3, rotation);
               break;
-
             case BitmapStickerIcon.RIGHT_BOTTOM:
               configIconMatrix(icon, x4, y4, rotation);
               break;
@@ -653,6 +649,11 @@ public class StickerView extends FrameLayout {
       handlingSticker.release();
       handlingSticker = null;
     }
+    invalidate();
+  }
+
+  public void releaseHandlingSticker() {
+    handlingSticker = null;
     invalidate();
   }
 

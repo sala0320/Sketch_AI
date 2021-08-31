@@ -1,6 +1,5 @@
 package edu.skku.sketchtogether;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -20,24 +19,17 @@ import java.util.ArrayList;
 public class DrawingView extends View {
     private Path drawPath;
     private Paint drawPaint;
-    public int selectedColor;
     private Paint canvasPaint;
-    public int paintColor, prev_paintColor;
+    public int paintColor;
     private Canvas drawCanvas;
-    private boolean erase = false;
     private Bitmap canvasBitmap;
 
     private ArrayList<Path> paths = new ArrayList<Path>();
-    private ArrayList<Path> undonePaths = new ArrayList<Path>();
-    private ArrayList<Integer> colors = new ArrayList<Integer>();
-    private ArrayList<Integer> colorsWith = new ArrayList<Integer>();
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
-
-    private static final int PEN_MODE = 1;
-    private static final int ERASER_MODE = 2;
-    private static final float PEN_BRUSH_SIZE = 20;
-    private static final float ERASER_BRUSH_SIZE = 20;
+    private static final float SMALL_BRUSH_SIZE = 20;
+    private float penBrushSize = SMALL_BRUSH_SIZE;
+    private float eraserBrushSize = SMALL_BRUSH_SIZE;
 
     public DrawingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -51,7 +43,7 @@ public class DrawingView extends View {
         drawPaint = new Paint();
 
         drawPaint.setColor(Color.BLACK);
-        drawPaint.setStrokeWidth(PEN_BRUSH_SIZE);
+        drawPaint.setStrokeWidth(SMALL_BRUSH_SIZE);
         drawPaint.setAntiAlias(true);
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
@@ -60,11 +52,10 @@ public class DrawingView extends View {
         canvasPaint = new Paint(Paint.DITHER_FLAG);
     }
 
-    @SuppressLint("ResourceAsColor")
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         canvas.drawPath(drawPath, drawPaint);
-        paths.add(drawPath);
+        // paths.add(drawPath);
     }
 
     public void setPaintColor(int color) {
@@ -107,11 +98,11 @@ public class DrawingView extends View {
     }
 
     public void touchStart(float x, float y) {
-        undonePaths.clear();
         drawPath.reset();
         drawPath.moveTo(x, y);
         mX = x;
         mY = y;
+
     }
 
     private void touchUp() {
@@ -132,25 +123,47 @@ public class DrawingView extends View {
         }
     }
 
+    public void eraseArea(float left, float top, float right, float bottom) {
+        drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        drawPaint.setStyle(Paint.Style.FILL);
+        drawCanvas.drawRect(left, top, right, bottom, drawPaint);
+
+        drawPaint.setXfermode(null);
+        drawPaint.setStyle(Paint.Style.STROKE);
+    }
+
     public void eraseAll() {
         drawPath = new Path();
         paths.clear();
-        drawCanvas.drawColor(Color.WHITE);
+        eraseArea(0, 0, this.getWidth(), this.getHeight());
         invalidate();
     }
 
-    public void setTouchEventMode(int touchEventMode) {
-        if (touchEventMode == PEN_MODE) {
-            drawPaint.setColor(paintColor);
-            drawPaint.setXfermode(null);
-            drawPaint.setStrokeWidth(PEN_BRUSH_SIZE);
-            invalidate();
-        }
-        else if (touchEventMode == ERASER_MODE) {
-            drawPaint.setColor(Color.TRANSPARENT);
-            drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-            drawPaint.setStrokeWidth(ERASER_BRUSH_SIZE);
-        }
+    public void setPenMode() {
+        drawPaint.setXfermode(null);
+        drawPaint.setColor(paintColor);
+        drawPaint.setStrokeWidth(penBrushSize);
+        invalidate();
+    }
+
+    public void setEraserMode() {
+        drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        drawPaint.setStrokeWidth(eraserBrushSize);
+    }
+
+    public void drawSticker(Bitmap bitmap) {
+        drawCanvas.drawBitmap(bitmap, 0, 0, null);
+    }
+
+    public Paint getDrawPaint() { return drawPaint; }
+
+    public void setPenBrushSize(float penBrushSize) {
+        this.penBrushSize = penBrushSize;
+        setPenMode();
+    }
+
+    public void setEraserBrushSize(float eraserBrushSize) {
+        this.eraserBrushSize = eraserBrushSize;
+        setEraserMode();
     }
 }
-

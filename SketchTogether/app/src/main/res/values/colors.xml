@@ -9,9 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="light_gray">#EFEFEF</color>
     <color name="gray">#CFCFCF</color>
-    <color name="colorPrimary">#009688</color>
-    <color name="colorPrimaryDark">#00796B</color>
-    <color name="colorAccent">#00BCD4</color>
-    <color name="custom">#FFFFFF</color>
-    <color name="col">#000000</color>
+    <color name="dark_gray">#AFAFAF</color>
 </resources>

@@ -68,8 +68,23 @@ public class CursorView extends View {
                 invalidate();  // Tell View that the canvas needs to be redrawn
                 break;
             case MotionEvent.ACTION_UP:
+                float temp;
                 drawRectangle = false; // Stop drawing the rectangle
                 performClick();
+                if (endCoordinate.x < beginCoordinate.x) {
+                    temp = beginCoordinate.x;
+                    beginCoordinate.x = endCoordinate.x;
+                    endCoordinate.x = temp;
+                }
+                if (endCoordinate.y < beginCoordinate.y) {
+                    temp = beginCoordinate.y;
+                    beginCoordinate.y = endCoordinate.y;
+                    endCoordinate.y = temp;
+                }
+                System.out.println(beginCoordinate.x);
+                System.out.println(beginCoordinate.y);
+                System.out.println(endCoordinate.x);
+                System.out.println(endCoordinate.y);
                 break;
         }
         return true;
