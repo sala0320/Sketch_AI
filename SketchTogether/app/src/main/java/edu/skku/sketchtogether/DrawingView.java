@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import androidx.annotation.Nullable;
 
+import android.graphics.PathMeasure;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
@@ -25,6 +26,8 @@ public class DrawingView extends View {
     private Bitmap canvasBitmap;
 
     private ArrayList<Path> paths = new ArrayList<Path>();
+    private ArrayList<Float> points = new ArrayList<>();
+    private ArrayList<ArrayList<Float>> allPoints = new ArrayList<>();
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
     private static final float SMALL_BRUSH_SIZE = 20;
@@ -55,7 +58,6 @@ public class DrawingView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         canvas.drawPath(drawPath, drawPaint);
-        // paths.add(drawPath);
     }
 
     public void setPaintColor(int color) {
@@ -99,18 +101,20 @@ public class DrawingView extends View {
 
     public void touchStart(float x, float y) {
         drawPath.reset();
+        points.clear();
         drawPath.moveTo(x, y);
         mX = x;
         mY = y;
-
+        points.add(x);
+        points.add(y);
     }
 
     private void touchUp() {
         drawPath.lineTo(mX, mY);
         drawCanvas.drawPath(drawPath, drawPaint);
         paths.add(drawPath);
+        allPoints.add(points);
         drawPath = new Path();
-        //eraseAll(false);
     }
 
     private void touchMove(float x, float y) {
@@ -120,6 +124,8 @@ public class DrawingView extends View {
             drawPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
+            points.add(x);
+            points.add(y);
         }
     }
 
@@ -153,6 +159,10 @@ public class DrawingView extends View {
 
     public void drawSticker(Bitmap bitmap) {
         drawCanvas.drawBitmap(bitmap, 0, 0, null);
+    }
+
+    public ArrayList<ArrayList<Float>> getAllPoints() {
+        return allPoints;
     }
 
     public Paint getDrawPaint() { return drawPaint; }

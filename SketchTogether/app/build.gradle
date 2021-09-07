@@ -37,13 +37,13 @@ dependencies {
     implementation 'com.ssomai:android.scalablelayout:2.1.6'
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'petrov.kristiyan:colorpicker-library:1.1.8'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'com.android.support:design:27.1.1'
     implementation 'com.karumi:dexter:4.2.0'
-
     implementation 'com.squareup.okhttp3:okhttp:3.4.2'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
     implementation 'com.squareup.okhttp3:okhttp:3.8.0'
+
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
 }

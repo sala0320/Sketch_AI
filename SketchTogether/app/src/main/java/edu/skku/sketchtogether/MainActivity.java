@@ -3,6 +3,10 @@ package edu.skku.sketchtogether;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -11,8 +15,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -29,8 +37,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -45,6 +57,7 @@ import petrov.kristiyan.colorpicker.ColorPicker;
 public class MainActivity extends AppCompatActivity {
 
     Context context;
+
     FrameLayout sketchLayout;
     DrawingView sketchingView;
     DrawingView coloringView;
@@ -71,11 +84,25 @@ public class MainActivity extends AppCompatActivity {
     ImageView neighborImageView3;
     ImageView neighborImageView4;
 
+    BluetoothManager bluetoothManager;
+    BluetoothAdapter bluetoothAdapter;
+    Set<BluetoothDevice> pairedDevices;
+    List<String> pairedDevicesList;
+    BluetoothDevice bluetoothDevice;
+    BluetoothSocket bluetoothSocket;
+    private static final UUID bluetoothUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    long downTime;
+    long eventTime;
+    float touchX = 0.0f;
+    float touchY = 0.0f;
+
     private static final float SMALL_BRUSH_SIZE = 20;
     private static final float MEDIUM_BRUSH_SIZE = 60;
     private static final float LARGE_BRUSH_SIZE = 100;
     private boolean isSketchFinished = false;
     private boolean isEraserMode = false;
+    private boolean isTouchMode = false;
 
     Bitmap sketchScreenShot; // 스케치 캡쳐
     Bitmap croppedScreenshot; // 인공지능에 넣을 부분 캡쳐
@@ -87,6 +114,29 @@ public class MainActivity extends AppCompatActivity {
         context = this.getApplicationContext();
 
         findViewsById();
+        OpenBTSocket();
+
+        sketchLayout.setOnGenericMotionListener(new View.OnGenericMotionListener() {
+            @Override
+            public boolean onGenericMotion(View v, MotionEvent event) {
+                touchX = event.getX();
+                touchY = event.getY();
+                if (event.getAction() == MotionEvent.ACTION_HOVER_MOVE) {
+                    if (isTouchMode) {
+                        downTime = SystemClock.uptimeMillis();
+                        eventTime = SystemClock.uptimeMillis();
+                        MotionEvent moveMotionEvent = MotionEvent.obtain(downTime, eventTime+1000, MotionEvent.ACTION_MOVE, touchX, touchY, 0);
+                        if (isSketchFinished) {
+                            coloringView.dispatchTouchEvent(moveMotionEvent);
+                        }
+                        else {
+                            sketchingView.dispatchTouchEvent(moveMotionEvent);
+                        }
+                    }
+                }
+                return false;
+            }
+        });
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,21 +146,29 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("네", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        sketchScreenShot = getScreenshot(sketchingView);
+                        if (isSketchFinished) {
+                            // SendMessageByBT("Bluetooth!");
+                            Toast.makeText(getApplicationContext(), "채색이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            sketchScreenShot = getScreenshot(sketchingView);
 
-                        // 서버로 보내서 svg 변환
+                            // 로봇팔에 sketchScreenShot 전송
 
-                        isSketchFinished = true;
-                        brushViewLinearLayout.setVisibility(View.INVISIBLE);
-                        cursorButton.setVisibility(View.INVISIBLE);
-                        suggestButton.setVisibility(View.INVISIBLE);
-                        finishButton.setVisibility(View.GONE);
-                        penButton.setVisibility(View.GONE);
-                        colorButton.setVisibility(View.VISIBLE);
-                        brushButton.setVisibility(View.VISIBLE);
-                        coloringView.setVisibility(View.VISIBLE);
-                        coloringView.bringToFront();
-                        Toast.makeText(getApplicationContext(), "스케치가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                            isSketchFinished = true;
+                            brushViewLinearLayout.setVisibility(View.INVISIBLE);
+                            finishButton.setVisibility(View.GONE);
+                            deleteButton.setVisibility(View.GONE);
+                            penButton.setVisibility(View.GONE);
+                            eraserButton.setVisibility(View.GONE);
+                            cursorButton.setVisibility(View.GONE);
+                            suggestButton.setVisibility(View.GONE);
+                            colorButton.setVisibility(View.VISIBLE);
+                            brushButton.setVisibility(View.VISIBLE);
+                            coloringView.setVisibility(View.VISIBLE);
+                            coloringView.bringToFront();
+                            Toast.makeText(getApplicationContext(), "스케치가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 builder.setNegativeButton("아니오", new DialogInterface.OnClickListener(){
@@ -123,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         brushViewLinearLayout.setVisibility(View.INVISIBLE);
-                        if (isSketchFinished == true) {
+                        if (isSketchFinished) {
                             coloringView.eraseAll();
                         }
                         else {
@@ -172,10 +231,6 @@ public class MainActivity extends AppCompatActivity {
                 isEraserMode = false;
                 coloringView.bringToFront();
                 coloringView.setPenMode();
-                setBrushView(smallBrushView, SMALL_BRUSH_SIZE);
-                setBrushView(mediumBrushView, MEDIUM_BRUSH_SIZE);
-                setBrushView(largeBrushView, LARGE_BRUSH_SIZE);
-                brushViewLinearLayout.setVisibility(View.VISIBLE);
             }
         });
 
@@ -187,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 setBrushView(mediumBrushView, MEDIUM_BRUSH_SIZE);
                 setBrushView(largeBrushView, LARGE_BRUSH_SIZE);
                 brushViewLinearLayout.setVisibility(View.VISIBLE);
-                if (isSketchFinished == false) {
+                if (!isSketchFinished) {
                     sketchingView.bringToFront();
                     sketchingView.setEraserMode();
                 }
@@ -201,10 +256,10 @@ public class MainActivity extends AppCompatActivity {
         smallBrushView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isEraserMode == false) {
+                if (!isEraserMode) {
                     coloringView.setPenBrushSize(SMALL_BRUSH_SIZE);
                 }
-                else if (isSketchFinished == false) {
+                else if (!isSketchFinished) {
                     sketchingView.setEraserBrushSize(SMALL_BRUSH_SIZE);
                 }
                 else {
@@ -216,10 +271,10 @@ public class MainActivity extends AppCompatActivity {
         mediumBrushView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isEraserMode == false) {
+                if (!isEraserMode) {
                     coloringView.setPenBrushSize(MEDIUM_BRUSH_SIZE);
                 }
-                else if (isSketchFinished == false) {
+                else if (!isSketchFinished) {
                     sketchingView.setEraserBrushSize(MEDIUM_BRUSH_SIZE);
                 }
                 else {
@@ -231,10 +286,10 @@ public class MainActivity extends AppCompatActivity {
         largeBrushView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isEraserMode == false) {
+                if (!isEraserMode) {
                     coloringView.setPenBrushSize(LARGE_BRUSH_SIZE);
                 }
-                else if (isSketchFinished == false) {
+                else if (!isSketchFinished) {
                     sketchingView.setEraserBrushSize(LARGE_BRUSH_SIZE);
                 }
                 else {
@@ -258,12 +313,8 @@ public class MainActivity extends AppCompatActivity {
                 buttonLinearLayout.setVisibility(View.INVISIBLE);
                 stickerView.bringToFront();
                 croppedScreenshot = getCroppedScreenshot(sketchLayout);
-
-                // croppedScreenshot 서버 전송하는 코드
-//                String filepath = " ";
-                System.out.println("FilePath" + String.valueOf(getFilesDir()));
                 File fileimg = BitmapConvertFile(croppedScreenshot, String.valueOf(getFilesDir()) + "file.bin");
-                goSend(fileimg);
+                SendData2Server(fileimg);
             }
         });
 
@@ -328,8 +379,110 @@ public class MainActivity extends AppCompatActivity {
                 buttonLinearLayout.setVisibility(View.VISIBLE);
             }
         });
-
     }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d("key pressed", String.valueOf(event.getKeyCode()));
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                Log.d("KeyUP Event", "볼륨업 키 down");
+                isTouchMode ^= true;
+                if (isTouchMode) {
+                    downTime = SystemClock.uptimeMillis();
+                    eventTime = SystemClock.uptimeMillis();
+                    MotionEvent downMotionEvent = MotionEvent.obtain(downTime, eventTime+1000, MotionEvent.ACTION_DOWN, touchX, touchY, 0);
+                    if (isSketchFinished) {
+                        coloringView.dispatchTouchEvent(downMotionEvent);
+                    }
+                    else {
+                        sketchingView.dispatchTouchEvent(downMotionEvent);
+                    }
+                }
+                else {
+                    MotionEvent upMotionEvent = MotionEvent.obtain(downTime, eventTime+1000, MotionEvent.ACTION_UP, touchX, touchY, 0);
+                    if (isSketchFinished) {
+                        coloringView.dispatchTouchEvent(upMotionEvent);
+                    }
+                    else {
+                        sketchingView.dispatchTouchEvent(upMotionEvent);
+                    }
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                Log.d("KeyUP Event", "볼륨다운 키 down");
+                return true;
+        }
+        return false;
+    }
+    // 블루투스 연결
+    public void OpenBTSocket() {
+        bluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()){
+            Toast.makeText(getApplicationContext(), "bluetoothAdapter error", Toast.LENGTH_LONG).show();
+            return;
+        }
+        pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("장치 선택");
+
+            pairedDevicesList = new ArrayList<String>();
+            for (BluetoothDevice device : pairedDevices) {
+                pairedDevicesList.add(device.getName());
+            }
+            final CharSequence[] items = pairedDevicesList.toArray(new CharSequence[pairedDevicesList.size()]);
+            pairedDevicesList.toArray(new CharSequence[pairedDevicesList.size()]);
+
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    for (BluetoothDevice device : pairedDevices) {
+                        if (items[item].toString().equals(device.getName())) {
+                            bluetoothDevice = device;
+                            System.out.println(bluetoothDevice);
+                            break;
+                        }
+                    }
+
+                    try {
+                        bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(bluetoothUUID);
+                        System.out.println(bluetoothSocket);
+                        if(bluetoothSocket.isConnected())
+                            bluetoothSocket.close();
+                        else
+                            bluetoothSocket.connect();
+                    } catch (IOException e) {
+                        Log.e("BluetoothService", "Connect Fail");
+                        Toast.makeText(getApplicationContext(), "bluetoothSocket.connect() error", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "pairing error", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // 블루투스로 텍스트 전송
+    public void SendMessageByBT(String message) {
+        OutputStream mmOutStream = null;
+        try {
+            mmOutStream = bluetoothSocket.getOutputStream();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "bluetoothSocket.getOutputStream() error", Toast.LENGTH_LONG).show();
+        }
+
+        byte[] bytes = message.getBytes();
+        try {
+            mmOutStream.write(bytes);
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "mmOutStream.write() error", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // 비트맵 -> 파일
     public File BitmapConvertFile(Bitmap bitmap, String strFilePath) {
         File file = new File(getFilesDir(), "file.bin") ;
         OutputStream out = null;
@@ -344,7 +497,8 @@ public class MainActivity extends AppCompatActivity {
         return file;
     }
 
-    public void goSend(File file){
+    // 파일 서버 전송
+    public void SendData2Server(File file){
         Log.d("TEST : ", "Request");
 
         RequestBody requestBody = new MultipartBody.Builder()
@@ -396,11 +550,6 @@ public class MainActivity extends AppCompatActivity {
                             Glide.with(context).load(resourceId3).into(neighborImageView3);
                             Glide.with(context).load(resourceId4).into(neighborImageView4);
                             imageViewLinearLayout.setVisibility(View.VISIBLE);
-
-//                            suggestImage1.setImageResource(resourceId1);
-//                            suggestImage2.setImageResource(resourceId2);
-//                            suggestImage3.setImageResource(resourceId3);
-//                            suggestImage4.setImageResource(resourceId4);
                         }
                     });
                 } catch(JSONException e){
@@ -409,6 +558,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     // 브러쉬 사이즈 표시
     protected void setBrushView(ImageView view, float size) {
         int width = eraserButton.getWidth() * 2;
@@ -417,7 +567,7 @@ public class MainActivity extends AppCompatActivity {
         Canvas canvas = new Canvas(bitmap);
 
         Paint drawPaint = coloringView.getDrawPaint();
-        if (isEraserMode == true) {
+        if (isEraserMode) {
             drawPaint.setXfermode(null);
             drawPaint.setColor(Color.BLACK);
         }
@@ -519,5 +669,4 @@ public class MainActivity extends AppCompatActivity {
         neighborImageView3 = findViewById(R.id.neighborImageView3);
         neighborImageView4 = findViewById(R.id.neighborImageView4);
     }
-
 }
