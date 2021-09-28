@@ -5,12 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:backgroundTint="@color/white"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp"
         android:orientation="horizontal"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,172 +18,150 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="parent">
 
-        <LinearLayout
-            android:id="@+id/displayLayout"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="9"
+        <FrameLayout
+            android:id="@+id/sketchLayout"
+            android:layout_width="600dp"
+            android:layout_height="300dp"
+            android:background="@drawable/border"
             android:gravity="center"
-            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/buttonLinearLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <FrameLayout
+            <LinearLayout
+                android:id="@+id/brushViewLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="invisible">
 
-                <LinearLayout
-                    android:id="@+id/brushViewLinearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="invisible">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/smallBrushView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/smallBrushView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:clickable="true">
-                    </androidx.appcompat.widget.AppCompatImageView>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/mediumBrushView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/mediumBrushView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:clickable="true">
-                    </androidx.appcompat.widget.AppCompatImageView>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/largeBrushView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/largeBrushView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:clickable="true">
-                    </androidx.appcompat.widget.AppCompatImageView>
+            </LinearLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/imageViewLinearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:paddingBottom="10dp"
-                    android:orientation="horizontal"
-                    android:visibility="invisible">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/neighborImageView1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-                    </androidx.appcompat.widget.AppCompatImageView>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/neighborImageView2"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-                    </androidx.appcompat.widget.AppCompatImageView>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/neighborImageView3"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-                    </androidx.appcompat.widget.AppCompatImageView>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/neighborImageView4"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-                    </androidx.appcompat.widget.AppCompatImageView>
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/deleteButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="10dp"
-                        android:src="@drawable/icon_delete"
-                        app:backgroundTint="@color/gray"
-                        app:fabSize="mini">
-                    </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/checkButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="10dp"
-                        android:src="@drawable/icon_check"
-                        android:visibility="gone"
-                        app:backgroundTint="@color/gray"
-                        app:fabSize="mini">
-                    </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
-                </LinearLayout>
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/sketchLayout"
+            <LinearLayout
+                android:id="@+id/imageViewLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="5"
-                android:background="@drawable/border">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="invisible">
 
-                <edu.skku.sketchtogether.CursorView
-                    android:id="@+id/cursorView"
-                    android:layout_width="match_parent"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/neighborImageView1"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/transparent">
-                </edu.skku.sketchtogether.CursorView>
+                    android:layout_weight="1"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
-                <edu.skku.sketchtogether.StickerView
-                    android:id="@+id/stickerView"
-                    android:layout_width="match_parent"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/neighborImageView2"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/transparent">
-                </edu.skku.sketchtogether.StickerView>
+                    android:layout_weight="1"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
-                <edu.skku.sketchtogether.DrawingView
-                    android:id="@+id/sketchingView"
-                    android:layout_width="match_parent"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/neighborImageView3"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/transparent">
-                </edu.skku.sketchtogether.DrawingView>
+                    android:layout_weight="1"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
-                <edu.skku.sketchtogether.DrawingView
-                    android:id="@+id/coloringView"
-                    android:layout_width="match_parent"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/neighborImageView4"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@android:color/transparent"
-                    android:visibility="invisible">
-                </edu.skku.sketchtogether.DrawingView>
+                    android:layout_weight="1"
+                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
 
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/deleteButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/icon_delete"
+                    app:backgroundTint="@color/light_gray"
+                    app:borderWidth="3dp"
+                    app:fabSize="normal"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 
-            </FrameLayout>
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/checkButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/icon_check"
+                    android:visibility="gone"
+                    app:backgroundTint="@color/light_gray"
+                    app:borderWidth="3dp"
+                    app:fabSize="normal"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 
-        </LinearLayout>
+            </LinearLayout>
+
+            <edu.skku.sketchtogether.CursorView
+                android:id="@+id/cursorView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:backgroundTint="@android:color/transparent"></edu.skku.sketchtogether.CursorView>
+
+            <edu.skku.sketchtogether.StickerView
+                android:id="@+id/stickerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:backgroundTint="@android:color/transparent">
+
+            </edu.skku.sketchtogether.StickerView>
+
+            <edu.skku.sketchtogether.DrawingView
+                android:id="@+id/sketchingView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:backgroundTint="@android:color/transparent"></edu.skku.sketchtogether.DrawingView>
+
+            <edu.skku.sketchtogether.DrawingView
+                android:id="@+id/coloringView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"
+                app:backgroundTint="@android:color/transparent"></edu.skku.sketchtogether.DrawingView>
+
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/buttonLinearLayout"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="bottom|end"
+            android:gravity="center"
+            android:layout_marginStart="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/displayLayout"
@@ -196,8 +174,9 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:src="@drawable/icon_trash_can"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -207,8 +186,9 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:src="@drawable/icon_check"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -218,8 +198,9 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:src="@drawable/icon_pen"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -228,22 +209,11 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_margin="5dp"
+                android:visibility="gone"
                 android:src="@drawable/icon_palette"
-                android:visibility="gone"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
-            </com.google.android.material.floatingactionbutton.FloatingActionButton>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/brushButton"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                android:src="@drawable/icon_brush"
-                android:visibility="gone"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -253,8 +223,9 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:src="@drawable/icon_eraser"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -264,8 +235,9 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:src="@drawable/icon_cursor"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -275,8 +247,9 @@
                 android:layout_weight="1"
                 android:layout_margin="5dp"
                 android:src="@drawable/icon_star"
-                app:backgroundTint="@color/gray"
-                app:fabSize="mini">
+                app:backgroundTint="@color/light_gray"
+                app:fabSize="normal"
+                app:borderWidth="3dp">
             </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
         </LinearLayout>
