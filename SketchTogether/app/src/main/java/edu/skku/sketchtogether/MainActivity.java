@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -118,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     private final String screenshotFileName = "screenshot.png";
 
     private Bitmap sketchScreenshot; // 스케치 캡쳐
-    private String filePath;
+    private String internalFilePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,9 +126,10 @@ public class MainActivity extends AppCompatActivity {
         context = this.getApplicationContext();
 
         findViewsById();
+
         // OpenBTSocket();
-        File fileDir = getFilesDir();
-        filePath = fileDir.getPath();
+        File internalFileDir = getFilesDir();
+        internalFilePath = internalFileDir.getPath();
 
         PressButton(PEN_MODE);
 
@@ -168,22 +168,30 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         if (isSketchFinished) {
-                            // 로봇팔에 txt 파일 전송
                             saveTextFile(textFileName);
+
+                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), textFileName));
+
+                            Intent shareIntent = new Intent();
+                            shareIntent.setAction(Intent.ACTION_SEND);
+                            shareIntent.setType("text/*");    // 고정
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                            startActivity(Intent.createChooser(shareIntent, "Sharing"));
+
                             Toast.makeText(getApplicationContext(), "채색이 완료되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                         else {
                             sketchScreenshot = getScreenshot(sketchingView);
                             saveImage(context, screenshotFileName, sketchScreenshot);
-                            File sketchScreenShotFile = BitmapConvertFile(sketchScreenshot, String.valueOf(getFilesDir()) + "sketch.bin");
-                            SendData2Server(sketchScreenShotFile);
-                            // 서버에서 svg 받아서 로봇팔에 전송
-                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), "screenshot.png"));
+                            File sketchScreenShotFile = Bmp2File(sketchScreenshot, String.valueOf(getFilesDir()) + "sketch.bin");
+//                            SendScreenshot2Server(sketchScreenShotFile);
+                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), screenshotFileName));
 
                             Intent shareIntent = new Intent();
                             shareIntent.setAction(Intent.ACTION_SEND);
                             shareIntent.setType("image/*");    // 고정
                             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
                             startActivity(Intent.createChooser(shareIntent, "Sharing"));
 
 
@@ -197,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                             colorButton.setVisibility(View.VISIBLE);
                             coloringView.setVisibility(View.VISIBLE);
                             coloringView.bringToFront();
-                            coloringView.setPenBrushSize(PEN_BRUSH_SIZE);
+                            coloringView.setPenBrushSize(20);
                             coloringView.setPenMode();
                             Toast.makeText(getApplicationContext(), "스케치가 완료되었습니다.", Toast.LENGTH_SHORT).show();
                         }
@@ -421,78 +429,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 터치 ON/OFF & 키보드로 그리기
+    // 터치 ON/OFF
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_A: // 키보드 A
-            case KeyEvent.KEYCODE_BACK: // 트랙볼 왼쪽 뒤로 가기
-                isTouchMode ^= true;
-                if (isTouchMode) {
-                    downTime = SystemClock.uptimeMillis();
-                    eventTime = SystemClock.uptimeMillis();
-                    MotionEvent downMotionEvent = MotionEvent.obtain(downTime, eventTime+1000, MotionEvent.ACTION_DOWN, touchX, touchY, 0);
-                    if (mode == PEN_MODE || mode == ERASER_MODE) {
-                        if (isSketchFinished) {
-                            coloringView.dispatchTouchEvent(downMotionEvent);
-                        } else {
-                            sketchingView.dispatchTouchEvent(downMotionEvent);
-                        }
+        if (keyCode == KeyEvent.KEYCODE_BACK) { // 트랙볼 왼쪽 뒤로 가기
+            isTouchMode ^= true;
+            if (isTouchMode) {
+                downTime = SystemClock.uptimeMillis();
+                eventTime = SystemClock.uptimeMillis();
+                MotionEvent downMotionEvent = MotionEvent.obtain(downTime, eventTime + 1000, MotionEvent.ACTION_DOWN, touchX, touchY, 0);
+                if (mode == PEN_MODE || mode == ERASER_MODE) {
+                    if (isSketchFinished) {
+                        coloringView.dispatchTouchEvent(downMotionEvent);
+                    } else {
+                        sketchingView.dispatchTouchEvent(downMotionEvent);
                     }
-                    else if (mode == CURSOR_MODE) {
-                        cursorView.dispatchTouchEvent(downMotionEvent);
-                    }
+                } else if (mode == CURSOR_MODE) {
+                    cursorView.dispatchTouchEvent(downMotionEvent);
                 }
-                else {
-                    MotionEvent upMotionEvent = MotionEvent.obtain(downTime, eventTime+1000, MotionEvent.ACTION_UP, touchX, touchY, 0);
-                    if (mode == PEN_MODE || mode == ERASER_MODE) {
-                        if (isSketchFinished) {
-                            coloringView.dispatchTouchEvent(upMotionEvent);
-                        } else {
-                            sketchingView.dispatchTouchEvent(upMotionEvent);
-                        }
+            } else {
+                MotionEvent upMotionEvent = MotionEvent.obtain(downTime, eventTime + 1000, MotionEvent.ACTION_UP, touchX, touchY, 0);
+                if (mode == PEN_MODE || mode == ERASER_MODE) {
+                    if (isSketchFinished) {
+                        coloringView.dispatchTouchEvent(upMotionEvent);
+                    } else {
+                        sketchingView.dispatchTouchEvent(upMotionEvent);
                     }
-                    else if (mode == CURSOR_MODE) {
-                        cursorView.dispatchTouchEvent(upMotionEvent);
-                    }
+                } else if (mode == CURSOR_MODE) {
+                    cursorView.dispatchTouchEvent(upMotionEvent);
                 }
-                return true;
-            case KeyEvent.KEYCODE_DPAD_UP:
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (isTouchMode) {
-                    keyboardTouchMove(keyCode);
-                }
-                return true;
+            }
         }
         return false;
-    }
-
-    // 키보드 터치 이벤트
-    protected void keyboardTouchMove(int keyCode) {
-        downTime = SystemClock.uptimeMillis();
-        eventTime = SystemClock.uptimeMillis();
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_UP:
-                touchY -= 5;
-                break;
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                touchY += 5;
-                break;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                touchX -= 5;
-                break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                touchX += 5;
-                break;
-        }
-        MotionEvent moveMotionEvent = MotionEvent.obtain(downTime, eventTime+1000, MotionEvent.ACTION_MOVE, touchX, touchY, 0);
-        if (isSketchFinished) {
-            coloringView.dispatchTouchEvent(moveMotionEvent);
-        }
-        else {
-            sketchingView.dispatchTouchEvent(moveMotionEvent);
-        }
     }
 
     // 버튼 모드 표시
@@ -532,8 +499,8 @@ public class MainActivity extends AppCompatActivity {
                 neighborImageView2.setImageBitmap(null);
                 neighborImageView3.setImageBitmap(null);
                 neighborImageView4.setImageBitmap(null);
-                Bitmap croppedScreenshot = invertBmp(getCroppedScreenshot(sketchLayout));
-                File croppedScreenshotFile = BitmapConvertFile(croppedScreenshot, String.valueOf(getFilesDir()) + "file.bin");
+                Bitmap croppedScreenshot = getCroppedScreenshot(sketchLayout);
+                File croppedScreenshotFile = Bmp2File(croppedScreenshot, String.valueOf(getFilesDir()) + "file.bin");
                 SendData2Server(croppedScreenshotFile);
                 stickerView.bringToFront();
                 imageViewLinearLayout.bringToFront();
@@ -554,7 +521,7 @@ public class MainActivity extends AppCompatActivity {
         Canvas canvas = new Canvas(bitmap);
 
         Paint drawPaint = coloringView.getDrawPaint();
-        drawPaint.setColor(ContextCompat.getColor(context, R.color.dark_gray));
+        drawPaint.setColor(ContextCompat.getColor(context, R.color.black));
         drawPaint.setStrokeWidth(size);
         canvas.drawLine(width / 4, height / 2, width * 3 / 4, height / 2, drawPaint);
         view.setImageBitmap(bitmap);
@@ -620,58 +587,35 @@ public class MainActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    // 흑백반전
-    private Bitmap invertBmp(final Bitmap originBmp){
-        int width, height;
-        width = originBmp.getWidth();
-        height = originBmp.getHeight();
-
-        Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        int A, R, G, B;
-        int pixel;
-
-        for (int x = 0; x < width; ++x) {
-            for (int y = 0; y < height; ++y) {
-                pixel = originBmp.getPixel(x, y);
-                A = Color.alpha(pixel);
-                R = Color.red(pixel);
-                G = Color.green(pixel);
-                B = Color.blue(pixel);
-                int gray = (int) (0.2989 * R + 0.5870 * G + 0.1140 * B);
-                if (gray > 128)
-                    gray = 0;
-                else
-                    gray = 255;
-                newBmp.setPixel(x, y, Color.argb(A, gray, gray, gray));
-            }
-        }
-        return newBmp;
-    }
-
     // 색상 선택
     protected void openColorPicker() {
         final ColorPicker colorPicker = new ColorPicker(this);
         final ArrayList<String> colors = new ArrayList<>();
-        colors.add("#258180");
-        colors.add("#3C8D2F");
-        colors.add("#20724F");
-        colors.add("#6a3ab2");
-        colors.add("#323299");
-        colors.add("#800080");
-        colors.add("#b79716");
-        colors.add("#966d37");
-        colors.add("#b77231");
         colors.add("#000000");
+        colors.add("#0D072E");
+        colors.add("#190F3A");
+        colors.add("#012362");
+        colors.add("#354C96");
+        colors.add("#1E468E");
+        colors.add("#004547");
+        colors.add("#03753A");
+        colors.add("#4F93B8");
+        colors.add("#95244D");
+        colors.add("#690E20");
+        colors.add("#461920");
+        colors.add("#961D12");
+        colors.add("#946314");
+        colors.add("#B03402");
+        colors.add("#C3732C");
+        colors.add("#BEBC46");
+        colors.add("#F2F2F2");
 
-        colorPicker.setRoundColorButton(true).setColumns(5).setColorButtonTickColor(Color.parseColor("#000000"))
-                .setDefaultColorButton(Color.parseColor("#000000")).setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
+        colorPicker.setColors(colors).setColumns(6).setRoundColorButton(true).setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
             @Override
             public void onChooseColor(int position, int color) {
                 coloringView.setPaintColor(color);
                 colorButton.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             }
-
             @Override
             public void onCancel() {
             }
@@ -679,7 +623,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 비트맵 -> 파일
-    public File BitmapConvertFile(Bitmap bitmap, String strFilePath) {
+    public File Bmp2File(Bitmap bitmap, String strFilePath) {
         File file = new File(getFilesDir(), "file.bin") ;
         OutputStream out = null;
         try {
@@ -703,7 +647,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://blee.iptime.org:22222/model")
+                .url("http://10.221.71.95:4567/model")
                 .post(requestBody)
                 .build();
 
@@ -754,11 +698,140 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    public void SendScreenshot2Server(File file){
+        Log.d("TEST : ", "Request");
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("files", "sketchfile", RequestBody.create(MultipartBody.FORM, file))
+                .build();
+
+        Request request = new Request.Builder()
+                .url("http://10.221.71.95:4567/conversion")
+                .post(requestBody)
+                .build();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
+                .writeTimeout(5, TimeUnit.MINUTES) // write timeout
+                .readTimeout(5, TimeUnit.MINUTES) // read timeout
+                .build();
+
+
+
+        client.newCall(request).enqueue(new Callback() {
+
+//            private File directory;
+//            private File fileToBeDownloaded;
+//            public CallbackToDownloadFile(String directory, String fileName) {
+//                this.directory = new File(directory);
+//                this.fileToBeDownloaded = new File(this.directory.getAbsolutePath() + "/" + fileName);
+//            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(
+                                MainActivity.this,
+                                "파일을 다운로드할 수 없습니다. 인터넷 연결을 확인하세요.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Log.d("TEST : ", "Response");
+                String responseData = response.body().string();
+                Log.d("TEST : ", responseData);
+
+//                try {
+//                    JSONObject json = new JSONObject(responseData);
+//                    System.out.println("JSON : " + json);
+//                    Toast.makeText(MainActivity.this, responseData, Toast.LENGTH_SHORT).show();
+//
+//                    if (!this.directory.exists()) {
+//                        this.directory.mkdirs();
+//                    }
+//
+//                    if (this.fileToBeDownloaded.exists()) {
+//                        this.fileToBeDownloaded.delete();
+//                    }
+//
+//                    try {
+//                        this.fileToBeDownloaded.createNewFile();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        runOnUiThread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(
+//                                        MainActivity.this,
+//                                        "다운로드 파일을 생성할 수 없습니다.",
+//                                        Toast.LENGTH_SHORT
+//                                ).show();
+//                            }
+//                        });
+//
+//                        return;
+//                    InputStream is = response.body().byteStream();
+//                    OutputStream os = new FileOutputStream(this.fileToBeDownloaded);
+//
+//                    final int BUFFER_SIZE = 2048;
+//                    byte[] data = new byte[BUFFER_SIZE];
+//
+//                    int count;
+//                    long total = 0;
+//
+//                    while ((count = is.read(data)) != -1) {
+//                        total += count;
+//                        os.write(data, 0, count);
+//                    }
+//
+//                    os.flush();
+//                    os.close();
+//                    is.close();
+//
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(
+//                                    MainActivity.this,
+//                                    "다운로드가 완료되었습니다.",
+//                                    Toast.LENGTH_SHORT
+//                            ).show();
+//                        }
+//                    });
+//
+
+
+//                    saveImage(context, screenshotFileName, sketchScreenshot);
+//                    Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), "screenshot.png"));
+
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");    // 고정
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, responseData);
+
+                    startActivity(Intent.createChooser(shareIntent, "Sharing"));
+//
+//                } catch(JSONException e){
+//                    e.printStackTrace();
+//                }
+            }
+        });
+    }
+
 
     // txt 파일 내부 저장소 저장
     public void saveTextFile(String filename){
         try {
-            FileOutputStream fos = new FileOutputStream(filePath+"/"+filename, false);
+            FileOutputStream fos = new FileOutputStream(internalFilePath +"/"+filename, false);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
             writer.write(coloringView.getColors().toString());
             writer.write("\n");

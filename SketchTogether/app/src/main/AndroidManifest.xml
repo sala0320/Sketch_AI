@@ -34,12 +34,9 @@
             android:authorities="edu.skku.sketchtogether.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
-
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepath" />
-
         </provider>
     </application>
-
 </manifest>

@@ -20,10 +20,10 @@
 
         <FrameLayout
             android:id="@+id/sketchLayout"
-            android:layout_width="600dp"
-            android:layout_height="300dp"
-            android:background="@drawable/border"
+            android:layout_width="1050dp"
+            android:layout_height="700dp"
             android:gravity="center"
+            android:background="@drawable/border"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/buttonLinearLayout"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,10 +33,10 @@
                 android:id="@+id/brushViewLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:visibility="invisible">
+                android:visibility="invisible"
+                android:layout_marginTop="10dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/smallBrushView"
@@ -44,7 +44,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/mediumBrushView"
@@ -52,7 +53,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/largeBrushView"
@@ -60,7 +62,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
             </LinearLayout>
 
@@ -68,61 +71,67 @@
                 android:id="@+id/imageViewLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:visibility="invisible">
+                android:visibility="invisible"
+                android:layout_marginTop="10dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/neighborImageView1"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/neighborImageView2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/neighborImageView3"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/neighborImageView4"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:clickable="true"></androidx.appcompat.widget.AppCompatImageView>
+                    android:clickable="true">
+                </androidx.appcompat.widget.AppCompatImageView>
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/deleteButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
+                    android:layout_marginStart="10dp"
                     android:src="@drawable/icon_delete"
                     app:backgroundTint="@color/light_gray"
-                    app:borderWidth="3dp"
-                    app:fabSize="normal"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+                    app:fabSize="normal"
+                    app:borderWidth="3dp">
+                </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/checkButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
+                    android:layout_marginStart="10dp"
                     android:src="@drawable/icon_check"
                     android:visibility="gone"
                     app:backgroundTint="@color/light_gray"
-                    app:borderWidth="3dp"
-                    app:fabSize="normal"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+                    app:fabSize="normal"
+                    app:borderWidth="3dp">
+                </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
             </LinearLayout>
 
@@ -130,7 +139,8 @@
                 android:id="@+id/cursorView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:backgroundTint="@android:color/transparent"></edu.skku.sketchtogether.CursorView>
+                app:backgroundTint="@android:color/transparent">
+            </edu.skku.sketchtogether.CursorView>
 
             <edu.skku.sketchtogether.StickerView
                 android:id="@+id/stickerView"
@@ -144,14 +154,16 @@
                 android:id="@+id/sketchingView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:backgroundTint="@android:color/transparent"></edu.skku.sketchtogether.DrawingView>
+                app:backgroundTint="@android:color/transparent">
+            </edu.skku.sketchtogether.DrawingView>
 
             <edu.skku.sketchtogether.DrawingView
                 android:id="@+id/coloringView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="invisible"
-                app:backgroundTint="@android:color/transparent"></edu.skku.sketchtogether.DrawingView>
+                app:backgroundTint="@android:color/transparent"
+                android:visibility="invisible">
+            </edu.skku.sketchtogether.DrawingView>
 
         </FrameLayout>
 
