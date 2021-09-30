@@ -29,5 +29,8 @@ __08.17__ (V2.1)
 
 __08.21__ (V3.1)
 - add paint board with color pen
+
+__09.29__ (V4.1)
+- add image sharing system
 --------------------------------------------
 ### Environment
