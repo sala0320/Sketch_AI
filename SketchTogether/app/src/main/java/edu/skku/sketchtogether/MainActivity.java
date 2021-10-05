@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isBrushViewSet = false;
 
     private final String textFileName = "textfile.txt";
-    private final String screenshotFileName = "screenshot.png";
+    private final String screenshotFileName = "screenshot.jpg";
 
     private Bitmap sketchScreenshot; // 스케치 캡쳐
     private String internalFilePath;
