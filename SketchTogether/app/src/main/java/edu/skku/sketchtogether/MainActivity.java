@@ -190,7 +190,20 @@ public class MainActivity extends AppCompatActivity {
                         else {
                             sketchScreenshot = getScreenshot(sketchingView);
                             saveImage(context, screenshotFileName, sketchScreenshot);
+<<<<<<< HEAD
                             SendScreenshot2Server(new File(context.getFilesDir(), screenshotFileName));
+=======
+                            File sketchScreenShotFile = Bmp2File(sketchScreenshot, String.valueOf(getFilesDir()) + "sketch.bin");
+                            SendScreenshot2Server(sketchScreenShotFile);
+                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), screenshotFileName));
+
+                            Intent shareIntent = new Intent();
+                            shareIntent.setAction(Intent.ACTION_SEND);
+                            shareIntent.setType("image/*");    // 고정
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+                            startActivity(Intent.createChooser(shareIntent, "Sharing"));
+>>>>>>> c9df8d0e563f4646210b1baf615b93b0914f216b
 
 //                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), screenshotFileName));
 //                            Intent shareIntent = new Intent();

@@ -20,7 +20,7 @@ __07.29__ (V2.1)
 - add extract nearest neighbor image
 
 --------------------------------------------
-### Android
+### Android (SketchTogether)
 __08.04__ (V1.1)
 - add feautre extraction tflite on Miso code  
 
@@ -32,5 +32,6 @@ __08.21__ (V3.1)
 
 __09.29__ (V4.1)
 - add image sharing system
+
 --------------------------------------------
 ### Environment

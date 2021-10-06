@@ -74,7 +74,11 @@ public class DrawingView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         drawCanvas = new Canvas(canvasBitmap);
+<<<<<<< HEAD
 //        drawCanvas.drawColor(Color.WHITE);
+=======
+        drawCanvas.drawColor(Color.WHITE);
+>>>>>>> c9df8d0e563f4646210b1baf615b93b0914f216b
     }
 
     public boolean onTouchEvent(MotionEvent motionEvent) {
