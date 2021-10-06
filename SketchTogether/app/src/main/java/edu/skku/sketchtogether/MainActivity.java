@@ -93,14 +93,12 @@ public class MainActivity extends AppCompatActivity {
     List<String> pairedDevicesList;
     BluetoothDevice bluetoothDevice;
     BluetoothSocket bluetoothSocket;
-    private static final UUID bluetoothUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     long downTime;
     long eventTime;
     float touchX = 0.0f;
     float touchY = 0.0f;
 
-    private static final float PEN_BRUSH_SIZE = 10;
     private static final float SMALL_ERASER_BRUSH_SIZE = 20;
     private static final float MEDIUM_ERASER_BRUSH_SIZE = 60;
     private static final float LARGE_ERASER_BRUSH_SIZE = 100;
@@ -114,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isBrushViewSet = false;
 
     private final String textFileName = "textfile.txt";
-    private final String screenshotFileName = "screenshot.png";
+    private final String screenshotFileName = "screenshot.jpg";
 
     private Bitmap sketchScreenshot; // 스케치 캡쳐
     private String internalFilePath;
@@ -169,31 +167,38 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         if (isSketchFinished) {
                             saveTextFile(textFileName);
-
                             Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), textFileName));
-
                             Intent shareIntent = new Intent();
                             shareIntent.setAction(Intent.ACTION_SEND);
                             shareIntent.setType("text/*");    // 고정
                             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                             startActivity(Intent.createChooser(shareIntent, "Sharing"));
 
+                            sketchingView.eraseAll();
+                            coloringView.eraseAll();
+                            isSketchFinished = false;
+                            penButton.setVisibility(View.VISIBLE);
+                            eraserButton.setVisibility(View.VISIBLE);
+                            cursorButton.setVisibility(View.VISIBLE);
+                            suggestButton.setVisibility(View.VISIBLE);
+                            colorButton.setVisibility(View.GONE);
+                            sketchingView.bringToFront();
+                            sketchingView.setPenMode();
+
                             Toast.makeText(getApplicationContext(), "채색이 완료되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                         else {
                             sketchScreenshot = getScreenshot(sketchingView);
                             saveImage(context, screenshotFileName, sketchScreenshot);
-                            File sketchScreenShotFile = Bmp2File(sketchScreenshot, String.valueOf(getFilesDir()) + "sketch.bin");
-//                            SendScreenshot2Server(sketchScreenShotFile);
-                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), screenshotFileName));
+                            SendScreenshot2Server(new File(context.getFilesDir(), screenshotFileName));
 
-                            Intent shareIntent = new Intent();
-                            shareIntent.setAction(Intent.ACTION_SEND);
-                            shareIntent.setType("image/*");    // 고정
-                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-
-                            startActivity(Intent.createChooser(shareIntent, "Sharing"));
-
+//                            Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), screenshotFileName));
+//                            Intent shareIntent = new Intent();
+//                            shareIntent.setAction(Intent.ACTION_SEND);
+//                            shareIntent.setType("image/*");    // 고정
+//                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+//
+//                            startActivity(Intent.createChooser(shareIntent, "Sharing"));
 
                             isSketchFinished = true;
                             brushViewLinearLayout.setVisibility(View.INVISIBLE);
@@ -504,7 +509,6 @@ public class MainActivity extends AppCompatActivity {
                 SendData2Server(croppedScreenshotFile);
                 stickerView.bringToFront();
                 imageViewLinearLayout.bringToFront();
-                neighborImageView1.setImageBitmap(croppedScreenshot);
                 break;
             default:
                 brushViewLinearLayout.setVisibility(View.INVISIBLE);
@@ -647,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://10.221.71.95:4567/model")
+                .url("http://blee.iptime.org:22222/model")
                 .post(requestBody)
                 .build();
 
@@ -707,7 +711,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://10.221.71.95:4567/conversion")
+                .url("http://blee.iptime.org:22222/conversion")
                 .post(requestBody)
                 .build();
 
@@ -717,16 +721,8 @@ public class MainActivity extends AppCompatActivity {
                 .readTimeout(5, TimeUnit.MINUTES) // read timeout
                 .build();
 
-
-
         client.newCall(request).enqueue(new Callback() {
 
-//            private File directory;
-//            private File fileToBeDownloaded;
-//            public CallbackToDownloadFile(String directory, String fileName) {
-//                this.directory = new File(directory);
-//                this.fileToBeDownloaded = new File(this.directory.getAbsolutePath() + "/" + fileName);
-//            }
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -749,80 +745,13 @@ public class MainActivity extends AppCompatActivity {
                 String responseData = response.body().string();
                 Log.d("TEST : ", responseData);
 
-//                try {
-//                    JSONObject json = new JSONObject(responseData);
-//                    System.out.println("JSON : " + json);
-//                    Toast.makeText(MainActivity.this, responseData, Toast.LENGTH_SHORT).show();
-//
-//                    if (!this.directory.exists()) {
-//                        this.directory.mkdirs();
-//                    }
-//
-//                    if (this.fileToBeDownloaded.exists()) {
-//                        this.fileToBeDownloaded.delete();
-//                    }
-//
-//                    try {
-//                        this.fileToBeDownloaded.createNewFile();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        runOnUiThread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                Toast.makeText(
-//                                        MainActivity.this,
-//                                        "다운로드 파일을 생성할 수 없습니다.",
-//                                        Toast.LENGTH_SHORT
-//                                ).show();
-//                            }
-//                        });
-//
-//                        return;
-//                    InputStream is = response.body().byteStream();
-//                    OutputStream os = new FileOutputStream(this.fileToBeDownloaded);
-//
-//                    final int BUFFER_SIZE = 2048;
-//                    byte[] data = new byte[BUFFER_SIZE];
-//
-//                    int count;
-//                    long total = 0;
-//
-//                    while ((count = is.read(data)) != -1) {
-//                        total += count;
-//                        os.write(data, 0, count);
-//                    }
-//
-//                    os.flush();
-//                    os.close();
-//                    is.close();
-//
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(
-//                                    MainActivity.this,
-//                                    "다운로드가 완료되었습니다.",
-//                                    Toast.LENGTH_SHORT
-//                            ).show();
-//                        }
-//                    });
-//
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");    // 고정
+                shareIntent.putExtra(Intent.EXTRA_TEXT, responseData);
 
+                startActivity(Intent.createChooser(shareIntent, "Sharing"));
 
-//                    saveImage(context, screenshotFileName, sketchScreenshot);
-//                    Uri uri = FileProvider.getUriForFile(context, "edu.skku.sketchtogether.fileprovider",new File(context.getFilesDir(), "screenshot.png"));
-
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");    // 고정
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, responseData);
-
-                    startActivity(Intent.createChooser(shareIntent, "Sharing"));
-//
-//                } catch(JSONException e){
-//                    e.printStackTrace();
-//                }
             }
         });
     }
