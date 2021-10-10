@@ -47,7 +47,7 @@ public class DrawingView extends View {
         drawPath = new Path();
         drawPaint = new Paint();
         canvasPaint = new Paint(Paint.DITHER_FLAG);
-//        canvasPaint.setColor(Color.WHITE);
+        canvasPaint.setColor(Color.WHITE);
         drawPaint.setColor(Color.BLACK);
         drawPaint.setStrokeWidth(penBrushSize);
         drawPaint.setAntiAlias(true);
@@ -74,11 +74,8 @@ public class DrawingView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         drawCanvas = new Canvas(canvasBitmap);
-<<<<<<< HEAD
-//        drawCanvas.drawColor(Color.WHITE);
-=======
         drawCanvas.drawColor(Color.WHITE);
->>>>>>> c9df8d0e563f4646210b1baf615b93b0914f216b
+
     }
 
     public boolean onTouchEvent(MotionEvent motionEvent) {

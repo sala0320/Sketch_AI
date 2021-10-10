@@ -28,21 +28,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="1045dp"
-                android:layout_height="695dp"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/white" />
-
             <LinearLayout
                 android:id="@+id/brushViewLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:visibility="invisible">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="1045dp"
+                    android:layout_height="700dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/white" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/smallBrushView"
